@@ -11,12 +11,13 @@ const campaign=require('./campaign.js')
 
 
 
-var serviceAccount = require("../config/serviceAccountKey.json");
+var serviceAccount = require("./config/serviceAccountKey.json");
 const { requires } = require("consolidate");
 
 firebaseApp=admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://socialinfluencer-10d72.firebaseio.com",
+  authDomain: "socialinfluencer-10d72.firebaseapp.com"
 });
 const db=firebaseApp.database();
 const csrfMiddleware = csrf({ cookie: true });
@@ -39,16 +40,15 @@ app.all("*", (req, res, next) => {
 
 app.get("/",(req,res)=>{
  
-  const sessionCookie = req.cookies.session || "";
+  const sessionCookie = req.cookies.__session || "";
   admin
     .auth()
     .verifySessionCookie(sessionCookie, true /** checkRevoked */)
     .then(() => {
-      getCamapigns()
-      .then(campaign=>{
+      var campaign=getCamapigns();
         console.log(campaign)
-        res.render("home", { campaign });
-      })
+        res.render("/home", { campaign });
+        return Promise.resolve(campaign);
     })
     .catch((error) => {
       res.redirect("/login");
@@ -56,12 +56,9 @@ app.get("/",(req,res)=>{
 })
 app.post("/campaign-details",(req,res)=>{
   var campID=req.query.campID;
-    getCamapignsbyID(campID)
-      .then(campaigns=>{
+    var campaigns=getCamapignsbyID(campID)
         console.log(campaigns)
         res.render("scampaign", { campaigns });
-      })
-
 })
 
 app.get("/login",(req,res)=>{
@@ -82,24 +79,33 @@ app.post("/sessionLogin", (req, res) => {
     .createSessionCookie(idToken, { expiresIn })
     .then(
       (sessionCookie) => {
-        const options = { maxAge: expiresIn, httpOnly: true };
-        res.cookie("session", sessionCookie, options);
+        const options = { maxAge: expiresIn, httpOnly: false,secure:true };
+        // res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+        res.setHeader('Cache-Control', 'private');
+        res.cookie("__session", sessionCookie, options);
         res.end(JSON.stringify({ status: "success" }));
+        return Promise.resolve("resolvrd");
       },
       (error) => {
         res.status(401).send("UNAUTHORIZED REQUEST!");
       }
-    );
+      
+    
+      
+    )
+    .catch(error=>{
+        
+    })
 });
 
 app.get("/sessionLogout", (req, res) => {
-  res.clearCookie("session");
+  res.clearCookie("__session");
   res.redirect("/login");
 });
 
 
 app.get("/home", function (req, res) {
-  const sessionCookie = req.cookies.session || "";
+  const sessionCookie = req.cookies.__session || "";
   var user=req.query.user;
   admin
     .auth()
@@ -109,7 +115,12 @@ app.get("/home", function (req, res) {
       .then(campaign=>{
         console.log(campaign)
         res.render("home", { campaign });
+        return Promise.resolve(campaign);
       })
+      .catch(error=>{
+        
+      })
+      return Promise.resolve("resolvrd");
     })
     .catch((error) => {
       res.redirect("/login");
@@ -125,6 +136,7 @@ app.get("/userDetails",function(req,res){
     // See the UserRecord reference doc for the contents of userRecord.
     console.log(`Successfully fetched user data: ${userRecord.toJSON()}`);
     res.render("home",{userRecord})
+    return Promise.resolve(userRecord);
   })
   .catch((error) => {
     console.log('Error fetching user data:', error);
@@ -142,6 +154,7 @@ app.get('/campaign',(req,res)=>{
   getCamapignsbyID(campid)
   .then(campaigns=>{
     res.render("campaign",campaigns)
+    return Promise.resolve(campaigns);
   })
   .catch((error) => {
     console.log("Error"+error)
