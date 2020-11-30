@@ -1,0 +1,38 @@
+
+ 
+   .backg
+   {
+       width:60vw;
+       height:100vh;
+      
+   }
+   body
+   {
+       background-color: #3f3f3f;
+   }
+   .logo
+   {
+       z-index: 1;
+       width: 20vw;
+       height:25vh;
+       position: absolute;
+       top: 10vh;
+       left: 70vw;
+
+   }
+   .not-block
+   {
+       position:absolute;
+       top:70vh;
+       left:69vw;
+       color:white;
+   }
+   .login-new
+   {
+    background-color: #05a3fa;  
+    margin-left: 8vw; 
+    padding-left:27px;
+    padding-right: 27px;
+   }
+  
+  

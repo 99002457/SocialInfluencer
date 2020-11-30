@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head> 
+    <title>Login</title>
+    <!-- Required meta tags -->
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script
+  src="jquery.js"
+  ></script>
+ 
+     <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles/LoginAdvertisers.css">
+    <script src="/__/firebase/8.1.1/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+<script src="/__/firebase/8.1.1/firebase-analytics.js"></script>
+<script defer src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+<!-- Initialize Firebase -->
+<script src="/__/firebase/init.js?useEmulator=true"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js" defer ></script>
+        
+</head>
+  <body >
+    <img src="images/background.jpg" class="back"/>
+ 
+    <img src="images/appLogo.png" class="logo"/>
+
+    <form method="POST">
+    <input type="email" placeholder="Advertiser username" name="email" id="userID" class="user"/>
+    <input type="password" placeholder="Advertiser password" id="password" class="pass"/>
+  </form>
+    <div class="buttons">
+   <button type="button" id="loginbtn"class="btn btn-light  login-new" value="Login as Influencer">Login</button> &nbsp<span>or</span>&nbsp
+   <button type="button" class="btn  btn-light  login-new-goolge" value="Login as Influencer"><img src="images/1342004.png" width="40vw" height="40vh"/></button>
+  
+  </div>
+   <a href="RegisterAdvertiser.html"><h4 class="not-block">Dont have an account?Create here.</h4></a>
+   <a href="index.html"><i class="fa fa-users users" aria-hidden="true" label="Select User"></i></a>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script>
+        window.addEventListener("DOMContentLoaded", () =>{
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+        });
+      $(document).ready(function(){
+          $('#loginbtn').click(function(){
+              firebase
+                .auth()
+                .signInWithEmailAndPassword($('#userID').val(), $('#password').val())
+                .then(({ user }) => {
+                  return user.getIdToken().then((idToken) => {
+                    return fetch("/sessionLogin", {
+                      method: "POST",
+                      headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json",
+                        "CSRF-Token": Cookies.get("XSRF-TOKEN"),
+                      },
+                      body: JSON.stringify({ idToken }),
+                    });
+                  });
+                })
+                .then(() => {
+                  return firebase.auth().signOut();
+                })
+                .then(() => {
+                  window.location.assign("/home");
+                });
+              return false;
+            });
+        });
+          
+         
+    </script>
+  
+  
+  
+  </body>
+</html>   

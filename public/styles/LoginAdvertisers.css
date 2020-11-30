@@ -1,0 +1,84 @@
+ .back
+   {
+       width:60vw;
+       height:100vh;
+      
+   }
+   body
+   {
+       background-color: #3f3f3f;
+   }
+   .logo
+   {
+       z-index: 1;
+       width: 20vw;
+       height:25vh;
+       position: absolute;
+       top: 10vh;
+       left: 70vw;
+
+   }
+   .not-block
+   {
+       position:absolute;
+       top:74vh;
+       left:68vw;
+       color:white;
+   }
+   .login-new
+   {
+     
+    padding:1.8vh;
+
+   }
+   span{
+       color:white;
+   }
+   .login-new-google
+   {
+    background-color: #FFFFFF; 
+    padding:0vh;
+   }
+   .user
+   {
+    position:absolute;
+       top:40vh;
+       left:70vw;
+       color:#3f3f3f;
+   }
+   .pass
+   {
+    position:absolute;
+       top:48vh;
+       left:70vw;
+       color:#3f3f3f;
+   }
+  
+  
+   input 
+   {
+     border-radius: 50px;
+     border: none;
+     height:2.3rem;
+     width: 20rem;
+     
+   }
+   .buttons
+   {
+    position:absolute;
+       top:60vh;
+       left:74vw;
+       
+   }
+   input::placeholder {  
+     text-align: center; 
+     } 
+    .users
+   {
+    position:absolute;
+        top:80vh;
+       left:78vw;
+       color:white;
+       font-size: 3rem;
+
+   }
