@@ -39,16 +39,13 @@ app.all("*", (req, res, next) => {
 });
 
 app.get("/",(req,res)=>{
- 
-  const sessionCookie = req.cookies.__session || "";
+ const sessionCookie = req.cookies.__session || "";
   admin
     .auth()
     .verifySessionCookie(sessionCookie, true /** checkRevoked */)
     .then(() => {
-      var campaign=getCamapigns();
-        console.log(campaign)
-        res.render("/home", { campaign });
-        return Promise.resolve(campaign);
+        res.redirect("/home")
+        return Promise.resolve("redirect");
     })
     .catch((error) => {
       res.redirect("/login");
@@ -62,7 +59,14 @@ app.post("/campaign-details",(req,res)=>{
 })
 
 app.get("/login",(req,res)=>{
+  const sessionCookie = req.cookies.__session || "";
+  if(sessionCookie)
+  {
+    res.redirect("/home");
+  }
+  else{
   res.render("login");
+  }
 })
 
 app.get("/register",(req,res)=>{
@@ -87,7 +91,7 @@ app.post("/sessionLogin", (req, res) => {
         return Promise.resolve("resolvrd");
       },
       (error) => {
-        res.status(401).send("UNAUTHORIZED REQUEST!");
+        res.send(500,"UNAUTHORIZED REQUEST!");
       }
       
     
