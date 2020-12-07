@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Title</title>
+    <title>Social Influencer - Home</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -14,7 +14,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://fonts.googleapis.com/css?family=Oswald" rel=“stylesheet”>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
      <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+       <script type='text/javascript' src='handlebars-v4.7.6.js'></script>
+      <script>
+    
+      </script>
   </head>
   <body>
 
@@ -29,7 +34,7 @@
         <div class="collapse navbar-collapse" id="collapsibleNavId">-
           <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
             <li class="nav-item ">
-              <a class="nav-link" href="home"><i class="fa fa-home" aria-hidden="true"></i>Home</a>
+              <a class="nav-link active" href="home"><i class="fa fa-home" aria-hidden="true"></i>Home</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="profile">Profile</a>
@@ -49,32 +54,79 @@
   <img src="images/pic.png" class="img" alt="none" width="100%" height="50%">
      </div><br>
 {{#each campaign}}
-<div class="container">
-  <div class="row text-center text-md-left">
-    <div class="col-md-2 col-sm-2 imagecol">
-      <img src="{{this.Campaign_image}}" class="img-fluid rounded-circle w-75  " alt="">
+<div class="container" name="{{@key}}" date="{{this.End_Date}}" >
+  <div class="row text-center text-md-left "name="{{@key}}">
+    <div class="col-md-2 col-sm-2 imagecol" name="{{@key}}">
+      <img name="{{@key}}" src="{{this.Campaign_image}}" class="img-fluid rounded-circle w-75  " alt="">
     </div>
-    <div class="col-md-8 col-sm-4">
-      <h4 class="card-title ">{{this.Campaign_Name}}</h4>
-      <p class="card-text">{{this.Descripton}}</p>
+    <div class="col-md-8 col-sm-4 data" name="{{@key}}">
+      <h4 class="card-title" name="{{@key}}">{{this.Campaign_Name}}</h4>
+      <p class="card-text" name="{{@key}}">{{this.Descripton}}</p>
+      <p class="card-text datetext" name="{{@key}}" id="datetext" date="{{this.End_Date}}">Apply by {{this.End_Date}}</p>
     </div>
-    <div class="col-md-2 col-sm-2 ">
+    <div class="col-md-2 col-sm-2" name="{{@key}}">
       <a href="javascript:void(0)" class="btn btn-dark viewMore" id="{{@key}}"  name="{{@key}}">View More</a><br><br>
-      <a href="javascript:void(0)" class="btn btn-dark ApplyHere"  id="{{@key}}"name="{{@key}}">Apply here</a>
+      <a href="javascript:void(0)" class="btn btn-dark ApplyHere" date="{{this.End_Date}}"  id="{{@key}}"name="{{@key}}">Apply here</a>
     </div>
   </div> 
 </div>
 </div><br>
 {{/each}}
-
 <script>
+
+   $(document).ready(()=>{
+     $(".container").each(function(i,obj){
+      var enddate= $(this).find('.ApplyHere').attr('date');
+      const dateA = moment(enddate, 'DD-MM-YYYY');
+      const dateB = moment(new Date(),'DD-MM-YYYY');
+      var diff=dateA.diff(dateB,'days')-5;
+      console.log(diff);
+      if(diff>0)
+      {
+        $(this).find('.datetext').text("Apply by "+enddate);
+      }
+      else if(diff==0)
+      {
+      $(this).find('.datetext').text("Campaign ends today ("+enddate+")");
+      }
+      else{
+       $(this).find('.datetext').text("Campaign ended on ("+enddate+")");
+       $(this).find('.ApplyHere').removeClass("btn-dark");
+       $(this).find('.ApplyHere').addClass("btn btn-secondary");
+      }
+     })
+   });
+     
+
+   $('.container').click(function(){
+       if($(event.target).is('a'))
+       {
+         return;
+       }
+      
+       var campaign=$(event.target).attr("name");
+        window.location.assign("/campaign?campID="+campaign);
+   })
    $('.viewMore').click(function(){
        var campaign=event.target.id
         window.location.assign("/campaign?campID="+campaign);
    })
-    $('.ApplyHere').click(function(){
-       alert(event.target.id)
+
+    $('.ApplyHere').click(function(ev){
+      var enddate=$(this).attr("date");
+      const dateA = moment(enddate, 'DD-MM-YYYY');
+      const dateB = moment(new Date(),'DD-MM-YYYY');
+      var diff=dateA.diff(dateB,'days')-5;
+      if(diff>=0)
+      {
+        alert(diff+"Post Request");
+        var campaign=event.target.id  
+      }
+      else{ 
+
+      }
    })
+   
     </script>
 
     <!-- Optional JavaScript -->
