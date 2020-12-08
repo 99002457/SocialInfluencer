@@ -1,3 +1,9 @@
+// var admin = require("firebase-admin");
+// firebaseApp=admin.initializeApp({
+//     credential: admin.credential.cert(serviceAccount),
+//     databaseURL: "https://socialinfluencer-10d72.firebaseio.com",
+//     authDomain: "socialinfluencer-10d72.firebaseapp.com"
+//   });
 class campaign
 {
    constructor(id,name,des,categ,end_date,start_date,advertiser)
@@ -71,4 +77,22 @@ class campaign
     
 }
 
-module.exports.campaign;
+
+
+function getCamapigns()
+{
+    const ref= firebaseApp.database().ref('Campaigns'); 
+    console.log(ref.once('value').then(snap => snap.val()));
+    return ref.once('value').then(snap => snap.val()); 
+    //once for the getting data once since it returns the promise get the snapshot and unwrap the value
+}
+
+function getCamapignsbyID(campid)
+{
+    const ref= firebaseApp.database().ref('Campaigns/'+campid)
+    console.log(ref.once('value').then(snap => snap.val()));
+    return ref.once('value').then(snap => snap.val()); 
+    //once for the getting data once since it returns the promise get the snapshot and unwrap the value
+}
+
+module.exports={ campaign,getCamapigns,getCamapignsbyID}

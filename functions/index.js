@@ -1,4 +1,15 @@
-const cookieParser = require("cookie-parser");
+/*
+Imported Package Details
+cookieParser : For parsing the Session Cookies
+csurf: To identifiy the cross origin request forgery and allow only athenicated users to access the data
+firebase-function: To access the firebase cloud functions.
+express: To use the Express instead of traditional Nodejs HTTP function.
+firebase-admin: To use the Firebase Admin Function for auth,FCM,and other queries and handle the Firebase Backend.
+cors: to allow the cross origin request #needed for testing and makeit work on localhost without deploying.
+consolidate: To handle the handlebars, Creates a engine to render the .hbs files from NodeJS
+campaign: All Campaign related functions.
+*/
+const cookieParser = require("cookie-parser"); 
 const csrf = require("csurf");
 const bodyParser = require("body-parser");
 const functions = require('firebase-functions');
@@ -7,37 +18,47 @@ var admin = require("firebase-admin");
 const cors = require('cors');
 const { response } = require('express');
 const engines=require('consolidate');
-const campaign=require('./campaign.js')
+const Campaign=require('./campaign');
+// import * as InfluencerProfile from "./Iprofile.js";
+// import * as AdvertiserProfile from "./Aprofile.js";
 
 
-
+/*Service Account setup usind the serviceaccount.json to use google services*/
 var serviceAccount = require("./config/serviceAccountKey.json");
-const { requires } = require("consolidate");
+const { requires } = require("consolidate"); //never used but need it for further usage
 
+//Intialize the firebase Configuration 
 firebaseApp=admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://socialinfluencer-10d72.firebaseio.com",
   authDomain: "socialinfluencer-10d72.firebaseapp.com"
 });
+//Storing the firebase Database function in db
 const db=firebaseApp.database();
+//Setting the Csrf Middleware using the cookies to avoid the Unauthorized Cross Origin Requests 
 const csrfMiddleware = csrf({ cookie: true });
-const app=express(); //allows to the listen to the reuest and response
 
+//Creating the APpp
+const app=express(); //allows to the listen to the request and response
 
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(csrfMiddleware);
+/*
+express app uses the following function 
+*/
+app.use(cors());//Cross Origin Request
+app.use(bodyParser.json());//parse the post request body
+app.use(cookieParser());//parse the cookies
+app.use(csrfMiddleware);//csrf Middleware 
 app.engine('hbs',engines.handlebars);//creating the engine
 app.set('views','./views');//setting the views folder
 app.set('view engine','hbs');//using the engine created
 
+/*For all the request Check there is a csrf Token or not*/
 app.all("*", (req, res, next) => {
   res.cookie("XSRF-TOKEN", req.csrfToken());
   next();
 });
 
+/* Get Request for  / */
 app.get("/",(req,res)=>{
  const sessionCookie = req.cookies.__session || "";
   admin
@@ -51,13 +72,15 @@ app.get("/",(req,res)=>{
       res.redirect("/login");
     });
 })
+/* Get Request for  /campaign-details */
 app.post("/campaign-details",(req,res)=>{
   var campID=req.query.campID;
-    var campaigns=getCamapignsbyID(campID)
+    var campaigns=Campaign.getCamapignsbyID(campID)
         console.log(campaigns)
         res.render("scampaign", { campaigns });
 })
 
+/* Get Request for  login */
 app.get("/login",(req,res)=>{
   const sessionCookie = req.cookies.__session || "";
   if(sessionCookie)
@@ -69,10 +92,15 @@ app.get("/login",(req,res)=>{
   }
 })
 
+/* Get Request for Register  / */
 app.get("/register",(req,res)=>{
   res.render("register");
 })
-
+/* Get Request for Register  / */
+app.get("/profile",(req,res)=>{
+  res.render("profile");
+})
+/* Post Request for  /sessionLogin */
 app.post("/sessionLogin", (req, res) => {
   const idToken = req.body.idToken.toString();
 
@@ -80,7 +108,7 @@ app.post("/sessionLogin", (req, res) => {
 
   admin
     .auth()
-    .createSessionCookie(idToken, { expiresIn })
+    .createSessionCookie(idToken, { expiresIn }) 
     .then(
       (sessionCookie) => {
         const options = { maxAge: expiresIn, httpOnly: false,secure:true };
@@ -102,12 +130,13 @@ app.post("/sessionLogin", (req, res) => {
     })
 });
 
+/* Post Request for  /sessionLogout */
 app.get("/sessionLogout", (req, res) => {
   res.clearCookie("__session");
   res.redirect("/login");
 });
 
-
+/* Get Request for  /home */
 app.get("/home", function (req, res) {
   const sessionCookie = req.cookies.__session || "";
   var user=req.query.user;
@@ -115,7 +144,7 @@ app.get("/home", function (req, res) {
     .auth()
     .verifySessionCookie(sessionCookie, true /** checkRevoked */)
     .then(() => {
-      getCamapigns()
+      Campaign.getCamapigns()
       .then(campaign=>{
         console.log(campaign)
         res.render("home", { campaign });
@@ -131,6 +160,7 @@ app.get("/home", function (req, res) {
     });
 });
 
+/* Get Request for  /userDetails */
 app.get("/userDetails",function(req,res){
   var user=req.query.user;
   admin
@@ -149,13 +179,11 @@ app.get("/userDetails",function(req,res){
 });
 
 
-app.get('/timestamp',(request,response)=>{
-response.send(`${Date.now()}`)
-}); 
 
+/* Get Request for  /campaign */
 app.get('/campaign',(req,res)=>{
   var campid=req.query.campID;
-  getCamapignsbyID(campid)
+  Campaign.getCamapignsbyID(campid)
   .then(campaigns=>{
     res.render("campaign",campaigns)
     return Promise.resolve(campaigns);
@@ -165,19 +193,5 @@ app.get('/campaign',(req,res)=>{
   });
 }); 
 
-function getCamapigns()
-{
-    const ref= firebaseApp.database().ref('Campaigns'); 
-    console.log(ref.once('value').then(snap => snap.val()));
-    return ref.once('value').then(snap => snap.val()); 
-    //once for the getting data once since it returns the promise get the snapshot and unwrap the value
-}
 
-function getCamapignsbyID(campid)
-{
-    const ref= firebaseApp.database().ref('Campaigns/'+campid)
-    console.log(ref.once('value').then(snap => snap.val()));
-    return ref.once('value').then(snap => snap.val()); 
-    //once for the getting data once since it returns the promise get the snapshot and unwrap the value
-}
 exports.app = functions.https.onRequest(app); //on request call the function in the parameter list

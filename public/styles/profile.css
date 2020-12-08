@@ -1,5 +1,6 @@
 body{
     background-color: 	#e4fafb;
+    color:white;
 }
 .navbar{
     margin:auto;
@@ -14,7 +15,6 @@ p{
 body{
     color: 	#e4fafb;
 }
-
 .welcome
 {
     color: #FFFFFF;
@@ -46,7 +46,7 @@ body{
     
    
     border-radius: 0.2rem;
-    padding: 2%;
+     padding: 0.8%; 
    
     ;
 
@@ -57,12 +57,28 @@ img
     margin-left: 0% !important;
     
 }
+/* .container
+{
+
+    background: linear-gradient(0deg, rgb(204, 204, 204),rgb(255, 255, 255));
+    border-radius:1rem !important;
+    box-shadow: 12px 5px 15px -4px rgb(29,43,78), -12px 0 8px -4px rgba(29,43,25);
+    
+}
 .container
 {
 
-    background: linear-gradient(0deg,#8bc1da,#e4fafb);
+    background: linear-gradient(0deg, rgb(204, 204, 204),rgb(255, 255, 255));
     border-radius:1rem !important;
-    box-shadow: 12px 5px 15px -4px rgb(29,43,78), -12px 0 8px -4px rgb(29,43,78);
+    box-shadow: 12px 5px 15px -4px rgb(29,43,78), -12px 0 8px -4px rgba(29,43,25);
+    
+} */
+.container
+{
+
+    background: linear-gradient(75deg, #eeeeeed7,#2195f3c5);
+    border-radius:1rem !important;
+    box-shadow: 12px 5px 15px -4px rgb(29,43,78), -12px 0 8px -4px rgba(29,43,25);
     
 }
 form.example input[type=text] {
@@ -73,7 +89,11 @@ form.example input[type=text] {
     width: 80%;
     background: #f1f1f1;
   }
-  
+  .image-profile
+{
+    margin-top: -8rem !important;
+    margin-left: 5rem !important;
+}
   form.example button {
     float: left;
     width: 20%;
@@ -114,5 +134,12 @@ form.example input[type=text] {
     background-color: black;
     text-decoration-color: honeydew;
  
+}
+.head{
+    font-weight: 1000;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-style: italic;
+    text-align: center;
+  
 }
 

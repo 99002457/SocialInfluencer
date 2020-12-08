@@ -1,0 +1,1 @@
+admin = require("firebase-admin");
